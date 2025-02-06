@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 
 # Load environment variables
-load_dotenv()
-
+loaded = load_dotenv()
+print(loaded)
 # Strava OAuth URLs and parameters
 STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"

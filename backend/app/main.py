@@ -15,6 +15,7 @@ async def login():
     """ Redirect users to Strava's 3rd party app authorization page
     """
     auth_url = build_strava_auth_url()
+    print(auth_url)
     return RedirectResponse(url=auth_url)
 
 @app.get("/auth/callback")

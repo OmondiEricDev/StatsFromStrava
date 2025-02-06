@@ -1,8 +1,8 @@
-[project]
+[tool.poetry]
 name = "backend"
 version = "0.1.0"
 description = ""
-authors = [{name = "OmondiEricDev",email = "ericomondidev@gmail.com"}]
+authors = ["OmondiEricDev <ericomondidev@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
