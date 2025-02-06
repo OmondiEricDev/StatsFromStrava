@@ -23,6 +23,7 @@ async def callback(code: str):
 
     Args:
         code (str): Strava provided authorization code needed to obtain access token
+        NOTE: code can only be used once
     """
     token_data = await get_strava_access_token(code)
     if not token_data:
@@ -41,11 +42,15 @@ async def callback(code: str):
     #       }
     #      }
     #
-    # ** NOTE: token expiry details
+    # ** NOTE: token expiry details --> need to store refresh needed to obtain the next access token
     # ** NOTE: what kind of athlete info is in the summary???
     
     access_token = token_data.get("access_token")
+    token_type = token_data.get("token_type")
+    expires_at = token_data.get("expires_at")
+    refresh_token = token_data.get("refresh_token")
     athlete = token_data.get("athlete")
     
+    return token_data
     return {"access_token": access_token,
             "athlete": athlete}
