@@ -1,10 +1,19 @@
 # from typing import Union
+import os
+import redis
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from app.utils.auth import build_strava_auth_url, get_strava_access_token
 
-app = FastAPI()
+from app.api.router_configs import configure_routers
 
+loaded = load_dotenv()
+app = FastAPI()
+address = os.getenv("REDIS_ADDRESS")
+reddis_client = redis.Redis(host=address, port=os.getenv("REDIS_PORT"), db=0)
+
+configure_routers(app)
 
 @app.get("/")
 def read_root():
@@ -30,28 +39,39 @@ async def callback(code: str):
     if not token_data:
         raise HTTPException(status_code=400, detail="Failed to retrieve access token!!!")
     
-    # TODO: store access token in redis database and associate it with specific athlete
-    # ** Example token_data response
-    #     {
-    #       "token_type": "Bearer",
-    #       "expires_at": 1568775134,
-    #       "expires_in": 21600,
-    #       "refresh_token": "e5n567567...",
-    #       "access_token": "a4b945687g...",
-    #       "athlete": {
-    #           #{summary athlete representation}
-    #       }
-    #      }
-    #
-    # ** NOTE: token expiry details --> need to store refresh needed to obtain the next access token
-    # ** NOTE: what kind of athlete info is in the summary???
-    
     access_token = token_data.get("access_token")
-    token_type = token_data.get("token_type")
     expires_at = token_data.get("expires_at")
+    expires_in = token_data.get("expires_in")
     refresh_token = token_data.get("refresh_token")
     athlete = token_data.get("athlete")
+    athlete_id = athlete.get("id")
     
-    return token_data
-    return {"access_token": access_token,
-            "athlete": athlete}
+    user_profile = {
+        "username": athlete.get("username"),
+        "firstName": athlete.get("firstname"),
+        "lastName": athlete.get("lastname"),
+        "bio": athlete.get("bio"),
+        "city": athlete.get("city"),
+        "state": athlete.get("state"),
+        "country": athlete.get("country"),
+        "sex": athlete.get("sex"),
+        "createdAt": athlete.get("created_at"),
+        "updatedAt": athlete.get("updated_at"),
+        "profileMedium": athlete.get("profile_medium"),
+        "profileLarge": athlete.get("profile"),
+    }
+    
+    # Store access token in Redis    
+    reddis_client.hset(f"userAuth:{athlete_id}",
+               mapping={
+                   "access_token": access_token,
+                   "refresh_token": refresh_token,
+                   "expires_at": expires_at,
+                   "expires_in": expires_in,
+               },
+               )
+    
+    reddis_client.hset(f"userProfile:{athlete_id}",
+                       mapping=user_profile)
+
+    return RedirectResponse(url=f"/user/{athlete_id}")
