@@ -4,7 +4,7 @@ import redis
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from app.utils.auth import build_strava_auth_url, get_strava_access_token
+from app.utils.auth import build_strava_auth_url, init_access_token
 
 from app.api.router_configs import configure_routers
 
@@ -35,7 +35,7 @@ async def callback(code: str):
         code (str): Strava provided authorization code needed to obtain access token
         NOTE: code can only be used once
     """
-    token_data = await get_strava_access_token(code)
+    token_data = await init_access_token(code)
     if not token_data:
         raise HTTPException(status_code=400, detail="Failed to retrieve access token!!!")
     
@@ -70,6 +70,13 @@ async def callback(code: str):
                    "expires_in": expires_in,
                },
                )
+    
+    # Set expiry of current access token to original time - 60 seconds
+    ttl = expires_in - 60
+    reddis_client.hexpire(f"userAuth:{athlete_id}", ttl, "access_token")
+    
+    set_ttl = reddis_client.httl(f"userAuth:{athlete_id}", "access_token")
+    print(f"Access token TTL: {set_ttl}")
     
     reddis_client.hset(f"userProfile:{athlete_id}",
                        mapping=user_profile)

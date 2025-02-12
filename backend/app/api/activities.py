@@ -1,22 +1,21 @@
-import os
-import redis
-from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.services.activities import fetch_user_activities
 
 
-loaded = load_dotenv()
 router = APIRouter()
-
-address = os.getenv("REDIS_ADDRESS")
-reddis_client = redis.Redis(host=address, port=os.getenv("REDIS_PORT"), db=0)
-
 """
-All user activity related endpoints
+All endpoints for fetching user related acticity data
 """
 
 @router.get("/user/activities")
-def get_user_activities():
-    
-    
-    
-    return None
+async def get_user_activities():
+    """Fetch all activities for the logged in user
+
+    Returns:
+        _type_: _description_
+    """
+    try:
+        user_activities = await fetch_user_activities()
+        return user_activities
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch activities: {e}")    

@@ -17,9 +17,9 @@ CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
 CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("STRAVA_REDIRECT_URI")
 
-"""Build and return the auth URL
-"""
 def build_strava_auth_url() -> str:
+    """Build and return the auth URL
+    """
     return (
         f"{STRAVA_AUTH_URL}?"
         f"client_id={CLIENT_ID}&"
@@ -29,9 +29,9 @@ def build_strava_auth_url() -> str:
         f"scope={AUTH_SCOPE}"
     )
 
-""" Exchanges strava one time access code for an access token
-"""
-async def get_strava_access_token(code: str):
+async def init_access_token(code: str):
+    """ Exchanges strava one time access code for an access token
+    """
     data={
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
@@ -47,9 +47,16 @@ async def get_strava_access_token(code: str):
                             detail=f"Failed to fetch access token: {e}")
 
 
-""" Refresh the current user's access token for a new one
-"""
+async def get_access_token():
+    """ Returns access token if valid, otherwise returns a redreshed access token
+    """
+    
+
+
 async def refresh_access_token(refresh_token: str):
+    """ Refresh the current user's access token for a new one
+    Tokens should be refreshed if the TTl is < 3600 seconds
+    """
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
