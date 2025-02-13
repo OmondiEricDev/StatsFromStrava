@@ -39,3 +39,5 @@ dmypy.json
 
 # pytype static type analyzer
 .pytype/
+backend/app/__pycache__/*
+backend/app/utils/__pycache__/*
