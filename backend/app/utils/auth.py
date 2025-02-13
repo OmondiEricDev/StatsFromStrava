@@ -2,6 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from fastapi import HTTPException
+from app.services import redis as redis_service
 
 # Load environment variables
 loaded = load_dotenv()
@@ -50,7 +51,13 @@ async def init_access_token(code: str):
 async def get_access_token():
     """ Returns access token if valid, otherwise returns a redreshed access token
     """
+    user_id = 13974060 # Find a way to dynamically access this
+    if redis_service.access_token_exists(user_id):
+        return redis_service.get_access_token(user_id)
     
+    refresh_token = await redis_service.get_refresh_token(user_id)
+    refresh_response = await refresh_access_token(refresh_token)
+    return refresh_response.get("access_token")
 
 
 async def refresh_access_token(refresh_token: str):
@@ -66,6 +73,7 @@ async def refresh_access_token(refresh_token: str):
     try:
         response = requests.post(STRAVA_TOKEN_URL, data)
         response.raise_for_status()
+        redis_service.update_user_auth(response)
         return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=400,
