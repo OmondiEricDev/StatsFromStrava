@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+from fastapi import HTTPException
 
 
 """ Responsible for all interactions with the strava API"""
@@ -38,12 +39,15 @@ def get_strava_auth_url() -> str:
 def get_activities(access_token: str):
     try:
         headers = {
-            "Authorization": f"Authorization: Bearer {access_token}"
+            "Authorization": f"Bearer {access_token}"
         }
-        response = requests.post(url=f"{STRAVA_API_BASE_URL}athlete/activities?per_page=30", headers=headers)
+        print("BEFORE sending get activities")
+        response = requests.get(
+            url=f"{STRAVA_API_BASE_URL}athlete/activities",
+            headers=headers)
         print(f"From strava --> {response}")
         response.raise_for_status()
         return response
-    except Exception as e:
-        print(f"Unable to get activities: {e}")
+    except HTTPException as e:
+        print(f"{e.status_code} -> Unable to get activities: {e.detail}")
         return None
