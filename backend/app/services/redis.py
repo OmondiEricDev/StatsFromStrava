@@ -19,7 +19,8 @@ async def get_refresh_token(user_id: int) -> str:
 
 async def get_access_token(user_id: int) -> str:
     if await access_token_exists(user_id):
-        return redis_client.hget(f"userAuth:{user_id}", "access_token")
+        token = redis_client.hget(f"userAuth:{user_id}", "access_token")
+        return token
 
 async def update_user_auth(refresh_response_data):
     redis_client.hset("userAuth:13974060",

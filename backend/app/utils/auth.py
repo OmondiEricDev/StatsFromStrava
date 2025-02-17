@@ -11,7 +11,7 @@ print(loaded)
 STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
 APPROVAL_PROMPT = "auto"
-AUTH_SCOPE = "read_all,profile:read_all,activity:read_all"
+AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 # Get environment variables
 CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")

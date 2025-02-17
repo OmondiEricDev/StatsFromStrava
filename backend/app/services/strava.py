@@ -51,3 +51,17 @@ def get_activities(access_token: str):
     except HTTPException as e:
         print(f"{e.status_code} -> Unable to get activities: {e.detail}")
         return None
+
+def get_athlete(access_token: str):
+    token = "233dff6328eca275c55a4d1eb75a4466ae2f41e2"
+    try:
+        _headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(
+            url=f"{STRAVA_API_BASE_URL}athlete",
+            headers=_headers
+        )
+        response.raise_for_status()
+        return response
+    except HTTPException as e:
+        print(f"{e.status_code} --> Unable to get athlete: {e.detail}")
+        return None
