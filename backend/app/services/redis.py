@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 
 loaded = load_dotenv()
 redis_address = os.getenv("REDIS_ADDRESS")
-redis_client = redis.Redis(host=redis_address, port=os.getenv("REDIS_PORT"), db=0)
+redis_client = redis.Redis(host=redis_address,
+                           port=os.getenv("REDIS_PORT"),
+                           db=0,
+                           decode_responses=True)
 USER_ID = os.getenv("USER_ID") #NOTE: find a better way for this
 # TODO: Implement a thread safe version of this service using aioredis + error handling
 
@@ -19,7 +22,9 @@ async def get_refresh_token(user_id: int) -> str:
 
 async def get_access_token(user_id: int) -> str:
     if await access_token_exists(user_id):
-        token = redis_client.hget(f"userAuth:{user_id}", "access_token")
+        token: str = redis_client.hget(f"userAuth:{user_id}", "access_token")
+        print(f"ACCESS TOKEN ---> {token}")
+        print(token)
         return token
 
 async def update_user_auth(refresh_response_data):

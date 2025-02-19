@@ -16,5 +16,5 @@ async def fetch_all_activities():
     return activities
 
 
-async def fetch_activity(activity_id: int):
+async def fetch_activity_by_id(activity_id: int):
     access_token = await get_access_token()
