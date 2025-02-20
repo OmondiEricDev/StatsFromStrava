@@ -11,7 +11,7 @@ print(loaded)
 STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
 APPROVAL_PROMPT = "auto"
-AUTH_SCOPE = "read"
+AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 # Get environment variables
 CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
@@ -52,8 +52,8 @@ async def get_access_token():
     """ Returns access token if valid, otherwise returns a redreshed access token
     """
     user_id = 13974060 # Find a way to dynamically access this
-    if redis_service.access_token_exists(user_id):
-        return redis_service.get_access_token(user_id)
+    if await redis_service.access_token_exists(user_id):
+        return await redis_service.get_access_token(user_id)
     
     refresh_token = await redis_service.get_refresh_token(user_id)
     refresh_response = await refresh_access_token(refresh_token)
@@ -73,7 +73,7 @@ async def refresh_access_token(refresh_token: str):
     try:
         response = requests.post(STRAVA_TOKEN_URL, data)
         response.raise_for_status()
-        redis_service.update_user_auth(response)
+        await redis_service.update_user_auth(response)
         return response.json()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=400,

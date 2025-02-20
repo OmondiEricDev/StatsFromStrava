@@ -45,6 +45,9 @@ async def callback(code: str):
     refresh_token = token_data.get("refresh_token")
     athlete = token_data.get("athlete")
     athlete_id = athlete.get("id")
+    # access_scope = token_data.get("scope")
+    # print(token_data)
+    # print(f"Access scope: {access_scope}")
     
     user_profile = {
         "username": athlete.get("username"),
