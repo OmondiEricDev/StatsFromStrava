@@ -40,8 +40,9 @@ async def update_user_auth(refresh_response_data):
     ttl = refresh_response_data.get("expires_in") - 60
     redis_client.httl("userAuth:13974060", ttl, "access_token")
 
-async def create_hash_set(name: str, data: dict):
-    redis_client.hset(f"{name}:{USER_ID}", mapping=data)
+def create_hash_set(name_key: str, data: dict, ttl = 600000000):
+    redis_client.hset(name_key, mapping=data)
+    redis_client.expire(name_key, ttl)
 
 async def get_all_hash_fields(hash_set: str):
     return redis_client.hgetall(hash_set)
@@ -49,5 +50,6 @@ async def get_all_hash_fields(hash_set: str):
 async def get_hash_field(hash: str, field: str):
     redis_client.hget(hash, field)
 
-async def add_to_list(list_name: str, items: list):
-    redis_client.rpush(list_name, *items)
+def add_to_list(list_name: str, item, ttl = 600000000):
+    redis_client.rpush(list_name, item)
+    redis_client.expire(list_name, ttl)

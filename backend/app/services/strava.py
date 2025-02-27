@@ -63,3 +63,16 @@ def get_athlete(access_token: str):
     except HTTPException as e:
         print(f"{e.status_code} --> Unable to get athlete: {e.detail}")
         return None
+
+async def get_starred_segments(access_token: str):
+    try:
+        _headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(
+            url=f"{STRAVA_API_BASE_URL}segments/starred",
+            headers=_headers
+        )
+        response.raise_for_status()
+        return response.json()
+    except HTTPException as e:
+        print(f"{e.status_code} --> Unable to get starred segements: {e.detail}")
+        return None
