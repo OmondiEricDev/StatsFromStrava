@@ -10,6 +10,7 @@ redis_client = redis.Redis(host=redis_address,
                            decode_responses=True)
 USER_ID = os.getenv("USER_ID") #NOTE: find a better way for this
 # TODO: Implement a thread safe version of this service using aioredis + error handling
+# TODO: Implement this as a class
 
 async def access_token_exists(user_id: int) -> bool:
     access_token = redis_client.hget(f"userAuth:{user_id}", "access_token")
@@ -47,3 +48,6 @@ async def get_all_hash_fields(hash_set: str):
 
 async def get_hash_field(hash: str, field: str):
     redis_client.hget(hash, field)
+
+async def add_to_list(list_name: str, items: list):
+    redis_client.rpush(list_name, *items)
