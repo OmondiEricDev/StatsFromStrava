@@ -19,6 +19,11 @@ configure_routers(app)
 def read_root():
     return {"Hello": "world"}
 
+@app.get("/login")
+async def get_login_url():
+    auth_url = build_strava_auth_url()
+    return auth_url
+
 @app.get("/auth/login")
 async def login():
     """ Redirect users to Strava's 3rd party app authorization page
