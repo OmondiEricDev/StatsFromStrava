@@ -51,7 +51,6 @@ def get_activities(access_token: str):
         return None
 
 def get_athlete(access_token: str):
-    # token = "4b8e3f80cca6f7308fc883a8b51e0945f1cde60b"
     try:
         _headers = {"Authorization": f"Bearer {access_token}"}
         response = requests.get(

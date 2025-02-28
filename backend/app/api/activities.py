@@ -10,12 +10,8 @@ All endpoints for fetching user related activity data
 @router.get("/activities")
 async def get_all_activities():
     """Fetch all activities for the logged in user
-
-    Returns:
-        _type_: _description_
     """
     try:
-        print("Here 1111")
         user_activities = await activity_service.fetch_all_activities()
         return user_activities
     except Exception as e:
@@ -29,4 +25,4 @@ async def get_activity(activity_id: int):
     Args:
         activity_id (int): activity id_
     """
-    print("Here 22222222")
+    pass
