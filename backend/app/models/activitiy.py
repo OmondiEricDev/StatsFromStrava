@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class Activity(BaseModel):
     pass
 
+class Activities(BaseModel):
+    pass
 
 class Config:
     json_schema_extra = {
