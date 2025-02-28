@@ -6,44 +6,100 @@ from dotenv import load_dotenv
 loaded = load_dotenv()
 
 # Application's backend URL
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = st.secrets["BACKEND_URL"]
+CLIENT_ID = st.secrets["STRAVA_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["STRAVA_CLIENT_SECRET"]
+REDIRECT_URI = st.secrets["STRAVA_REDIRECT_URI"]
 
-APP_AUTH_URL = f"{BACKEND_URL}/auth/login"
+# Strava OAuth URLs
+STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
+STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
+APPROVAL_PROMPT = "auto"
+AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 def main():
     st.title("K/QOM Tracker")
-    
+    print("starting")
+    # Handle callback from Strava auth
+    handle_callback()
+    print("after callback")
     # Check if user is logged in
     if "access_token" not in st.session_state:
         st.session_state.access_token = None
-    
-    if "user_id" not in st.session_state:
-        st.session_state.user_id = None
 
-    if st.session_state.user_id:
-        st.success("You are logged in to!!!")
-        
-        user_profile = fetch_user_profile(13974060) # TODO: find a better way for this
-        if user_profile:
-            display_profile(user_profile)
-        else:
-            st.error("Failed to fetch user profile!!")
-        
-        # show_dashboard()
+    if st.session_state.access_token:
+        st.success("You are logged in!!!")
+        print("Logged in")
+        show_profile()
     else:
         st.warning("Please log in to view your stats")
+        print("not logged in!!!")
         if st.button("Log in with Strava"):
-            st.write(f"Redirecting to Strava login page:{APP_AUTH_URL}...")
-            # main()
+            auth_url = build_strava_auth_url()
+            st.markdown(f"[Strav Login]({auth_url})", unsafe_allow_html=True)
+            # st.write(f"Redirecting to [Strava Login]({auth_url})...")
             # st.rerun()
 
+def handle_callback():
+    query_params = st.experimental_get_query_params()
+    print(f"Query params === {query_params}")
+    if "code" in query_params:
+        code = query_params["code"][0]
+        token_data = exchange_code_for_token(code=code)        
+        print("Got the code")
+        if token_data:
+            st.session_state.access_token = token_data.get("access_token")
+            st.experimental_set_query_params() # Clears current data in query parameters
+            st.success("Login successful")
+            # Pass auth data to the backend
+            save_auth_data(token_data)
+            st.rerun()
+        else:
+            st.error("Failed to login, please try again")
+
+def save_auth_data(auth_data):
+    try:
+        response = requests.post(f"{BACKEND_URL}/auth-data", data=auth_data)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        st.error(f"Unable to save auth data {e}")
+
+def build_strava_auth_url() -> str:
+    """Build and return the auth URL
+    """
+    return (
+        f"{STRAVA_AUTH_URL}?"
+        f"client_id={CLIENT_ID}&"
+        f"redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&"
+        f"approval_prompt={APPROVAL_PROMPT}&"
+        f"scope={AUTH_SCOPE}"
+    )
+
+def exchange_code_for_token(code: str):
+    """ Exchanges strava one time access code for an access token
+    """
+    try:
+        print("Exchanging token")
+        data={
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "code": code,
+            "grant_type": "authorization_code"
+        }
+        response = requests.post(STRAVA_TOKEN_URL, data)
+        response.raise_for_status() # Raises an error if any
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(status_code=400, detail=f"Failed to fetch access token: {e}")
+        return None
 
 def show_profile():
     """
     Display users's Strava profile
     """
     st.header("Your Strava profile:")
-    
+    print("show profile")
     # Fetch user profile from the backend
     
 def auth_with_strava():

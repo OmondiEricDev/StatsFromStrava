@@ -41,3 +41,4 @@ dmypy.json
 .pytype/
 backend/app/__pycache__/*
 backend/app/utils/__pycache__/*
+frontend/app/.streamlit/secrets.toml
