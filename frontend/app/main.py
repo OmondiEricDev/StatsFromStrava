@@ -11,13 +11,16 @@ BACKEND_URL = "http://localhost:8000"
 APP_AUTH_URL = f"{BACKEND_URL}/auth/login"
 
 def main():
-    st.title("Fitness Analytics Dashboard")
+    st.title("K/QOM Tracker")
     
     # Check if user is logged in
     if "access_token" not in st.session_state:
         st.session_state.access_token = None
     
-    if st.session_state.access_token:
+    if "user_id" not in st.session_state:
+        st.session_state.user_id = None
+
+    if st.session_state.user_id:
         st.success("You are logged in to!!!")
         
         user_profile = fetch_user_profile(13974060) # TODO: find a better way for this
@@ -31,11 +34,6 @@ def main():
         st.warning("Please log in to view your stats")
         if st.button("Log in with Strava"):
             st.write(f"Redirecting to Strava login page:{APP_AUTH_URL}...")
-            user_profile = fetch_user_profile(13974060) # TODO: find a better way for this
-            if user_profile:
-                display_profile(user_profile)
-            else:
-                st.error("Failed to fetch user profile!!")
             # main()
             # st.rerun()
 
@@ -48,7 +46,14 @@ def show_profile():
     
     # Fetch user profile from the backend
     
-
+def auth_with_strava():
+    try:
+        response = requests.get(f"{BACKEND_URL}/login")
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to authenticate {e}")
+        return None
 
 def show_dashboard():
     """
