@@ -15,8 +15,10 @@ async def fetch_starred_segments():
     except Exception as e:
         raise Exception("Segment service :: Unable to fetch segments from Strava!")
 
+async def fetch_segment_by_id(segment_id: int):
+    pass
+
 async def save_starred_segments(segments: list):
-    print(len(segments))
     for segment_item in segments:
         segment_hash_key = f"starredSegment:{segment_item.get('id')}"
         athlete_pr_effort = segment_item.get("athlete_pr_effort")

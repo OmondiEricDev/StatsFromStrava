@@ -26,6 +26,7 @@ def main():
     # Check if user is logged in
     if "access_token" not in st.session_state:
         st.session_state.access_token = None
+        st.user_id = None
 
     if st.session_state.access_token:
         st.success("You are logged in!!!")
@@ -47,8 +48,11 @@ def handle_callback():
         code = query_params["code"][0]
         token_data = exchange_code_for_token(code=code)        
         print("Got the code")
+        print(token_data)
         if token_data:
             st.session_state.access_token = token_data.get("access_token")
+            athlete = token_data.get("athlete")
+            st.session_state.user_id = athlete.get("id")
             st.experimental_set_query_params() # Clears current data in query parameters
             st.success("Login successful")
             # Pass auth data to the backend
@@ -57,11 +61,12 @@ def handle_callback():
         else:
             st.error("Failed to login, please try again")
 
-def save_auth_data(auth_data):
+def save_auth_data(auth_response_data):
     try:
-        response = requests.post(f"{BACKEND_URL}/auth-data", data=auth_data)
+        response = requests.get(f"{BACKEND_URL}/authdata", json=auth_response_data)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
+        print(e)
         st.error(f"Unable to save auth data {e}")
 
 def build_strava_auth_url() -> str:
@@ -91,17 +96,21 @@ def exchange_code_for_token(code: str):
         response.raise_for_status() # Raises an error if any
         return response.json()
     except requests.exceptions.RequestException as e:
-        st.error(status_code=400, detail=f"Failed to fetch access token: {e}")
+        st.error(f"Failed to fetch access token: {e}")
         return None
 
 def show_profile():
     """
     Display users's Strava profile
     """
-    st.header("Your Strava profile:")
-    print("show profile")
-    # Fetch user profile from the backend
-    
+    user_profile = fetch_user_profile(st.session_state.user_id)
+    display_profile(user_profile)
+
+def show_starred_segments():
+    "Display user's starred segments"
+    starred_segments = fetch_starred_segments()
+    display_starred_segments(starred_segments)
+
 def auth_with_strava():
     try:
         response = requests.get(f"{BACKEND_URL}/login")
@@ -137,6 +146,26 @@ def fetch_user_profile(user_id: int):
         st.error(f"Failed to get user profile: {e}")
         return None
 
+def fetch_starred_segments():
+    """Fetch users's starred segments"""
+    try:
+        response = requests.get(f"{BACKEND_URL}/segments")
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        st.error(f"Failed to fetch starred segments --> {e}")
+        return None
+
+def fetch_segment_data(segment_id: int):
+    """Fetch segment data related to the given ID"""
+    try:
+        response = requests.get(f"{BACKEND_URL}/segment/{segment_id}")
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        st.error(f"Failed to fetch segment with ID: {segment_id} --> {e}")
+        return None
+
 def fetch_activities():
     """
     Fetch Strava activiy data from the backend
@@ -148,6 +177,9 @@ def fetch_activities():
     except requests.exceptions.RequestException as e:
         st.error(f"Failed to fetch user activity data: {e}")
         return None
+
+def display_starred_segments(starred_segments):
+    st.header("Starred segments:")
 
 def display_profile(profile):
     """
@@ -189,8 +221,3 @@ def display_activities(activities):
 
 if __name__ == "__main__":
     main()
-
-
-
-
-

@@ -33,8 +33,8 @@ async def login():
     return RedirectResponse(url=auth_url)
 
 # Store auth data from streamlit
-@app.post("/auth-data/")
-async def save_auth_data(auth_response_data):
+@app.get("/authdata")
+async def save_auth_data(auth_response_data: dict):
     if not auth_response_data:
         raise HTTPException(status_code=500, detail="Auth data not found")
 
