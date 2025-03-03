@@ -32,14 +32,13 @@ def main():
         st.success("You are logged in!!!")
         print("Logged in")
         show_profile()
+        show_starred_segments()
     else:
         st.warning("Please log in to view your stats")
         print("not logged in!!!")
         if st.button("Log in with Strava"):
             auth_url = build_strava_auth_url()
             st.markdown(f"[Strav Login]({auth_url})", unsafe_allow_html=True)
-            # st.write(f"Redirecting to [Strava Login]({auth_url})...")
-            # st.rerun()
 
 def handle_callback():
     query_params = st.experimental_get_query_params()
@@ -120,19 +119,19 @@ def auth_with_strava():
         st.error(f"Failed to authenticate {e}")
         return None
 
-def show_dashboard():
-    """
-    Display user activity data
-    """
-    st.header("Your Strava activities:")
+# def show_dashboard():
+#     """
+#     Display user activity data
+#     """
+#     st.header("Your Strava activities:")
     
-    # Fetch activity data from the backend
-    activities = fetch_activities()
-    if activities:
-        st.write(f"Found {len(activities)} activities")
-        display_activities(activities)
-    else:
-        st.error("Failed to fetch activities")
+#     # Fetch activity data from the backend
+#     activities = fetch_activities()
+#     if activities:
+#         st.write(f"Found {len(activities)} activities")
+#         display_activities(activities)
+#     else:
+#         st.error("Failed to fetch activities")
 
 def fetch_user_profile(user_id: int):
     """
@@ -166,20 +165,43 @@ def fetch_segment_data(segment_id: int):
         st.error(f"Failed to fetch segment with ID: {segment_id} --> {e}")
         return None
 
-def fetch_activities():
+def fetch_activity_by_id(activity_id: int):
     """
     Fetch Strava activiy data from the backend
     """
     try:
-        response = requests.get(f"{BACKEND_URL}/user/activities")
+        response = requests.get(f"{BACKEND_URL}activities/{activity_id}")
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        st.error(f"Failed to fetch user activity data: {e}")
+        st.error(f"Failed to fetch activity {activity_id} data: {e}")
         return None
 
 def display_starred_segments(starred_segments):
     st.header("Starred segments:")
+    for segment in starred_segments:
+        segment["pr_time"] = format_time(int(segment["pr_time"]))
+        
+    st.table(
+        [
+            {
+                "Name": segment.get("name"),
+                "Distance": segment.get("distance"),
+                "Climb category": segment.get("climb_category"),
+                "K/QOM": segment.get("K/QOM"),
+                "PR time": segment.get("pr_time"),
+                "PR date": segment.get("pr_date"),
+                "PR activity": segment.get("pr_activity_id")
+            }
+            for segment in starred_segments
+        ]
+    )
+
+def format_time(time_seconds: int):
+    minutes = int(time_seconds) // 60
+    seconds = minutes % 60
+    return f"{minutes:02}:{seconds:02}"
+    
 
 def display_profile(profile):
     """
@@ -200,23 +222,16 @@ def display_profile(profile):
         st.write(f"**Last Updated:** {profile['updatedAt']}")
         st.write(f"**Bio:** {profile['bio'] if profile['bio'] else 'No bio available.'}")
 
-def display_activities(activities):
+def display_activity(activity_data):
     """
     Display activities in a table
     """
     st.subheader("Activity table")
-    st.table(activities)
-    
-    # Activity distance bar chart
-    st.subheader("Activity distances")
-    activity_names = [act["name"] for act in activities]
-    activity_distances = [act["distance"] for act in activities]
-    st.bar_chart({"Distance (km)": activity_distances})
-    
-    # Activity duration line chart
-    st.subheader("Activity durations")
-    activity_durations = [act["elapsed_time"] for act in activities]
-    st.line_chart({"Duration": activity_durations})
+    st.table(
+        {
+            "Name": 
+        }
+    )
 
 
 if __name__ == "__main__":

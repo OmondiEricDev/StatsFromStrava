@@ -25,4 +25,8 @@ async def get_activity(activity_id: int):
     Args:
         activity_id (int): activity id_
     """
-    pass
+    try:
+        activity_data = await activity_service.fetch_activity_by_id(activity_id)
+        return activity_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get activity with id: {activity_id} -> {e}")

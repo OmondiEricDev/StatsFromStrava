@@ -53,3 +53,25 @@ async def get_hash_field(hash: str, field: str):
 def add_to_list(list_name: str, item, ttl = None):
     redis_client.rpush(list_name, item)
     redis_client.expire(list_name, ttl)
+    
+def add_to_set(set_name: str, item, ttl = None):
+    redis_client.sadd(set_name, item)
+    redis_client.expire(set_name, ttl)
+    
+async def get_starred_segments(list_name: str) -> list:
+    # List does not exist
+    if redis_client.scard(list_name) < 1:
+        return None
+    
+    segment_id_list = redis_client.smembers("starredSegments")
+    result_items = []
+    
+    for segment_id in segment_id_list:
+        segment_data = await get_all_hash_fields(f"starredSegment:{segment_id}")
+        result_items.append(segment_data)
+
+    return result_items
+
+async def get_activity_by_id(activity_id: int):
+    activity_data = get_all_hash_fields(f"activity:{activity_id}")
+    return activity_data

@@ -50,6 +50,20 @@ def get_activities(access_token: str):
         print(f"{e.status_code} -> Unable to get activities: {e.detail}")
         return None
 
+async def get_activity(access_token: str, activity_id: int):
+    try:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+        response = requests.get(
+            url=f"{STRAVA_API_BASE_URL}activities/{activity_id}",
+            headers=headers
+        )
+        response.raise_for_status()
+        return response.json()
+    except HTTPException as e:
+        print(f"{e.status_code} -> unable to get activity with ID {activity_id}: {e.detail}")
+
 def get_athlete(access_token: str):
     try:
         _headers = {"Authorization": f"Bearer {access_token}"}
