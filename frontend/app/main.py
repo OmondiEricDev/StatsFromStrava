@@ -22,8 +22,9 @@ def main():
     "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Tracker! 👑</h1>",
     unsafe_allow_html=True)
     # Handle callback from Strava auth
-    handle_callback()
-    print("after callback")
+    if st.query_params:
+        handle_callback()
+    
     # Check if user is logged in
     if "access_token" not in st.session_state:
         st.session_state.access_token = None
@@ -44,23 +45,25 @@ def main():
             st.markdown(f"[Strav Login]({auth_url})", unsafe_allow_html=True)
 
 def handle_callback():
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params.to_dict()
     if "code" in query_params:
-        code = query_params["code"][0]
+        code = query_params.get("code")
+        print(f"Got the code --> {code}")
         token_data = exchange_code_for_token(code=code)        
-        # print("Got the code")
-        # print(token_data)
+        print(token_data)
         if token_data:
             st.session_state.access_token = token_data.get("access_token")
             athlete = token_data.get("athlete")
             st.session_state.user_id = athlete.get("id")
-            st.experimental_set_query_params() # Clears current data in query parameters
+            st.query_params.clear()
             st.success("Login successful")
             # Pass auth data to the backend
             save_auth_data(token_data)
-            st.rerun()
+            # st.rerun()
         else:
             st.error("Failed to login, please try again")
+    print("callback processed")
+    st.rerun()
 
 def save_auth_data(auth_response_data):
     try:
