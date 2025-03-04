@@ -73,5 +73,5 @@ async def get_starred_segments(list_name: str) -> list:
     return result_items
 
 async def get_activity_by_id(activity_id: int):
-    activity_data = get_all_hash_fields(f"activity:{activity_id}")
+    activity_data = await get_all_hash_fields(f"activity:{activity_id}")
     return activity_data

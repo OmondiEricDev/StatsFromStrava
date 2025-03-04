@@ -18,8 +18,9 @@ APPROVAL_PROMPT = "auto"
 AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 def main():
-    st.title("K/QOM Tracker")
-    print("starting")
+    st.markdown(
+    "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Tracker! 👑</h1>",
+    unsafe_allow_html=True)
     # Handle callback from Strava auth
     handle_callback()
     print("after callback")
@@ -30,24 +31,25 @@ def main():
 
     if st.session_state.access_token:
         st.success("You are logged in!!!")
-        print("Logged in")
-        show_profile()
-        show_starred_segments()
+        st.page_link("main.py", label="Home", icon="🏠", use_container_width=True)
+        st.page_link("pages/profile.py", label="Profile", icon="👤", use_container_width=True)
+        st.page_link("pages/segments.py", label="Segments", icon="🏁", use_container_width=True)
+        fetch_user_profile(st.session_state.user_id)
+        fetch_starred_segments()
     else:
         st.warning("Please log in to view your stats")
-        print("not logged in!!!")
         if st.button("Log in with Strava"):
+            
             auth_url = build_strava_auth_url()
             st.markdown(f"[Strav Login]({auth_url})", unsafe_allow_html=True)
 
 def handle_callback():
     query_params = st.experimental_get_query_params()
-    print(f"Query params === {query_params}")
     if "code" in query_params:
         code = query_params["code"][0]
         token_data = exchange_code_for_token(code=code)        
-        print("Got the code")
-        print(token_data)
+        # print("Got the code")
+        # print(token_data)
         if token_data:
             st.session_state.access_token = token_data.get("access_token")
             athlete = token_data.get("athlete")
@@ -84,7 +86,7 @@ def exchange_code_for_token(code: str):
     """ Exchanges strava one time access code for an access token
     """
     try:
-        print("Exchanging token")
+        # print("Exchanging token")
         data={
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
@@ -98,17 +100,6 @@ def exchange_code_for_token(code: str):
         st.error(f"Failed to fetch access token: {e}")
         return None
 
-def show_profile():
-    """
-    Display users's Strava profile
-    """
-    user_profile = fetch_user_profile(st.session_state.user_id)
-    display_profile(user_profile)
-
-def show_starred_segments():
-    "Display user's starred segments"
-    starred_segments = fetch_starred_segments()
-    display_starred_segments(starred_segments)
 
 def auth_with_strava():
     try:
@@ -119,20 +110,6 @@ def auth_with_strava():
         st.error(f"Failed to authenticate {e}")
         return None
 
-# def show_dashboard():
-#     """
-#     Display user activity data
-#     """
-#     st.header("Your Strava activities:")
-    
-#     # Fetch activity data from the backend
-#     activities = fetch_activities()
-#     if activities:
-#         st.write(f"Found {len(activities)} activities")
-#         display_activities(activities)
-#     else:
-#         st.error("Failed to fetch activities")
-
 def fetch_user_profile(user_id: int):
     """
     Fetch user's Strava profile
@@ -140,6 +117,7 @@ def fetch_user_profile(user_id: int):
     try:
         response = requests.get(f"{BACKEND_URL}/user/{user_id}")
         response.raise_for_status()
+        st.session_state.profile = response.json()
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Failed to get user profile: {e}")
@@ -150,10 +128,10 @@ def fetch_starred_segments():
     try:
         response = requests.get(f"{BACKEND_URL}/segments")
         response.raise_for_status()
-        return response.json()
+        st.session_state.starred_segments = response.json()
+        # return response.json()
     except requests.RequestException as e:
         st.error(f"Failed to fetch starred segments --> {e}")
-        return None
 
 def fetch_segment_data(segment_id: int):
     """Fetch segment data related to the given ID"""
@@ -167,72 +145,15 @@ def fetch_segment_data(segment_id: int):
 
 def fetch_activity_by_id(activity_id: int):
     """
-    Fetch Strava activiy data from the backend
+    Fetch Strava activity data from the backend
     """
     try:
-        response = requests.get(f"{BACKEND_URL}activities/{activity_id}")
+        response = requests.get(f"{BACKEND_URL}/activities/{activity_id}")
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        st.error(f"Failed to fetch activity {activity_id} data: {e}")
+        st.error(f"Failed to fetch activity {activity_id} -->: {e}")
         return None
-
-def display_starred_segments(starred_segments):
-    st.header("Starred segments:")
-    for segment in starred_segments:
-        segment["pr_time"] = format_time(int(segment["pr_time"]))
-        
-    st.table(
-        [
-            {
-                "Name": segment.get("name"),
-                "Distance": segment.get("distance"),
-                "Climb category": segment.get("climb_category"),
-                "K/QOM": segment.get("K/QOM"),
-                "PR time": segment.get("pr_time"),
-                "PR date": segment.get("pr_date"),
-                "PR activity": segment.get("pr_activity_id")
-            }
-            for segment in starred_segments
-        ]
-    )
-
-def format_time(time_seconds: int):
-    minutes = int(time_seconds) // 60
-    seconds = minutes % 60
-    return f"{minutes:02}:{seconds:02}"
-    
-
-def display_profile(profile):
-    """
-    Display user profile
-    """
-    st.header("Account details:")
-    
-    # Display profile picture
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        st.image(profile["profileMedium"], caption="Profile Picture", width=150)
-    with col2:
-        st.write(f"**Name:** {profile['firstName']} {profile['lastName']}")
-        st.write(f"**Username:** {profile['username']}")
-        st.write(f"**Location:** {profile['city']}, {profile['state']}, {profile['country']}")
-        st.write(f"**Gender:** {profile['sex']}")
-        st.write(f"**Member Since:** {profile['createdAt']}")
-        st.write(f"**Last Updated:** {profile['updatedAt']}")
-        st.write(f"**Bio:** {profile['bio'] if profile['bio'] else 'No bio available.'}")
-
-def display_activity(activity_data):
-    """
-    Display activities in a table
-    """
-    st.subheader("Activity table")
-    st.table(
-        {
-            "Name": 
-        }
-    )
-
 
 if __name__ == "__main__":
     main()

@@ -7,16 +7,15 @@ router = APIRouter()
 All endpoints for fetching user related activity data
 """
 
-@router.get("/activities")
-async def get_all_activities():
-    """Fetch all activities for the logged in user
-    """
-    try:
-        user_activities = await activity_service.fetch_all_activities()
-        return user_activities
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch activities: {e}")    
-
+# @router.get("/activities")
+# async def get_all_activities():
+#     """Fetch all activities for the logged in user
+#     """
+#     try:
+#         user_activities = await activity_service.fetch_all_activities()
+#         return user_activities
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Failed to fetch activities: {e}")
 
 @router.get("/activities/{activity_id}")
 async def get_activity(activity_id: int):
@@ -26,6 +25,7 @@ async def get_activity(activity_id: int):
         activity_id (int): activity id_
     """
     try:
+        print(f"fetching activity {activity_id} in activities.py")
         activity_data = await activity_service.fetch_activity_by_id(activity_id)
         return activity_data
     except Exception as e:
