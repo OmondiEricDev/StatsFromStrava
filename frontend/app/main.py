@@ -22,8 +22,8 @@ def main():
     "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Tracker! 👑</h1>",
     unsafe_allow_html=True)
     # Handle callback from Strava auth
-    if st.query_params:
-        handle_callback()
+    # if st.query_params:
+    #     handle_callback()
     
     # Check if user is logged in
     if "access_token" not in st.session_state:
@@ -31,7 +31,7 @@ def main():
         st.user_id = None
 
     if st.session_state.access_token:
-        st.success("You are logged in!!!")
+        # st.success("You are logged in!!!")
         st.page_link("main.py", label="Home", icon="🏠", use_container_width=True)
         st.page_link("pages/profile.py", label="Profile", icon="👤", use_container_width=True)
         st.page_link("pages/segments.py", label="Segments", icon="🏁", use_container_width=True)
