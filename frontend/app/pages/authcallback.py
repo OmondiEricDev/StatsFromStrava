@@ -47,6 +47,7 @@ async def main():
     st.success("Login successful")
 
     save_auth_data(token_data)
+    st.switch_page("main.py")
 
 def handle_callback(query_params):
     # query_params = st.query_params.to_dict()
