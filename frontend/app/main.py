@@ -18,34 +18,18 @@ APPROVAL_PROMPT = "auto"
 AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 
-
-# pages = {
-#     "🏠 Hone": "main.py",
-#     "👤 Profile": "profile.py",
-#     "🏁 Segments": "segments.py"
-# }
-
-# st.sidebar.title("Navigation")
-
-# for page_name, page_file in pages.items():
-#     if st.sidebar.button(page_name):
-#         st.switch_page(page=page_file)
-
 def main():
     st.markdown(
     "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Tracker! 👑</h1>",
     unsafe_allow_html=True)
 
     main_page = st.Page("main.py", title="Home", icon="🏠", default=True)
-    profile_page = st.Page("pages/profile.py", title="Profile", icon="👤")
-    segments_page = st.Page("pages/segments.py", title="Segments", icon="🏁")
-    authcallback_page = st.Page("pages/authcallback.py")
+    profile_page = st.Page("profile.py", title="Profile", icon="👤")
+    segments_page = st.Page("segments.py", title="Segments", icon="🏁")
+    authcallback_page = st.Page("authcallback.py", title="Auth")
 
     pg = st.navigation([main_page, profile_page, segments_page, authcallback_page])
     pg.run()
-    # Handle callback from Strava auth
-    # if st.query_params:
-    #     handle_callback()
     
     # Check if user is logged in
     if "access_token" not in st.session_state:
@@ -53,10 +37,6 @@ def main():
         st.user_id = None
 
     if st.session_state.access_token:
-        # st.success("You are logged in!!!")
-        # st.page_link("main.py", label="Home", icon="🏠", use_container_width=True)
-        # st.page_link("pages/profile.py", label="Profile", icon="👤", use_container_width=True)
-        # st.page_link("pages/segments.py", label="Segments", icon="🏁", use_container_width=True)
         fetch_user_profile(st.session_state.user_id)
         fetch_starred_segments()
     else:
@@ -154,7 +134,6 @@ def fetch_starred_segments():
         response = requests.get(f"{BACKEND_URL}/segments")
         response.raise_for_status()
         st.session_state.starred_segments = response.json()
-        # return response.json()
     except requests.RequestException as e:
         st.error(f"Failed to fetch starred segments --> {e}")
 
