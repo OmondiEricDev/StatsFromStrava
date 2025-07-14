@@ -17,7 +17,7 @@ async def get_starred_segments():
 async def get_segment_by_id(segment_id: int):
     """Fetch segment with the specified segment ID"""
     try:
-        selected_segment = segments_service.fetch_segment_by_id(segment_id)
+        selected_segment = await segments_service.fetch_segment_by_id(segment_id)
         return selected_segment
     except Exception as e:
         raise HTTPException(

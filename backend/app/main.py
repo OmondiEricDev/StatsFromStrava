@@ -19,6 +19,11 @@ configure_routers(app)
 def read_root():
     return {"Hello": "world"}
 
+@app.get("/login")
+async def get_login_url():
+    auth_url = build_strava_auth_url()
+    return auth_url
+
 @app.get("/auth/login")
 async def login():
     """ Redirect users to Strava's 3rd party app authorization page
@@ -26,6 +31,54 @@ async def login():
     auth_url = build_strava_auth_url()
     print(auth_url)
     return RedirectResponse(url=auth_url)
+
+# Store auth data from streamlit
+@app.get("/authdata")
+async def save_auth_data(auth_response_data: dict):
+    if not auth_response_data:
+        raise HTTPException(status_code=500, detail="Auth data not found")
+
+    access_token = auth_response_data.get("access_token")
+    expires_at = auth_response_data.get("expires_at")
+    expires_in = auth_response_data.get("expires_in")
+    refresh_token = auth_response_data.get("refresh_token")
+    athlete = auth_response_data.get("athlete")
+    athlete_id = athlete.get("id")
+    
+    user_profile = {
+        "username": athlete.get("username"),
+        "firstName": athlete.get("firstname"),
+        "lastName": athlete.get("lastname"),
+        "bio": athlete.get("bio"),
+        "city": athlete.get("city"),
+        "state": athlete.get("state"),
+        "country": athlete.get("country"),
+        "sex": athlete.get("sex"),
+        "createdAt": athlete.get("created_at"),
+        "updatedAt": athlete.get("updated_at"),
+        "profileMedium": athlete.get("profile_medium"),
+        "profileLarge": athlete.get("profile"),
+    }
+    
+    # Store access token in Redis    
+    reddis_client.hset(f"userAuth:{athlete_id}",
+               mapping={
+                   "access_token": access_token,
+                   "refresh_token": refresh_token,
+                   "expires_at": expires_at,
+                   "expires_in": expires_in,
+               },
+               )
+    
+    # Set expiry of current access token to original time - 60 seconds
+    ttl = expires_in - 60
+    reddis_client.hexpire(f"userAuth:{athlete_id}", ttl, "access_token")
+    
+    set_ttl = reddis_client.httl(f"userAuth:{athlete_id}", "access_token")
+    print(f"Access token TTL: {set_ttl}")
+    
+    reddis_client.hset(f"userProfile:{athlete_id}",
+                       mapping=user_profile)
 
 @app.get("/auth/callback")
 async def callback(code: str):

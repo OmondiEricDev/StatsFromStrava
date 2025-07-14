@@ -40,7 +40,7 @@ async def update_user_auth(refresh_response_data):
     ttl = refresh_response_data.get("expires_in") - 60
     redis_client.httl("userAuth:13974060", ttl, "access_token")
 
-def create_hash_set(name_key: str, data: dict, ttl = 600000000):
+def create_hash_set(name_key: str, data: dict, ttl = None):
     redis_client.hset(name_key, mapping=data)
     redis_client.expire(name_key, ttl)
 
@@ -50,6 +50,28 @@ async def get_all_hash_fields(hash_set: str):
 async def get_hash_field(hash: str, field: str):
     redis_client.hget(hash, field)
 
-def add_to_list(list_name: str, item, ttl = 600000000):
+def add_to_list(list_name: str, item, ttl = None):
     redis_client.rpush(list_name, item)
     redis_client.expire(list_name, ttl)
+    
+def add_to_set(set_name: str, item, ttl = None):
+    redis_client.sadd(set_name, item)
+    redis_client.expire(set_name, ttl)
+    
+async def get_starred_segments(list_name: str) -> list:
+    # List does not exist
+    if redis_client.scard(list_name) < 1:
+        return None
+    
+    segment_id_list = redis_client.smembers("starredSegments")
+    result_items = []
+    
+    for segment_id in segment_id_list:
+        segment_data = await get_all_hash_fields(f"starredSegment:{segment_id}")
+        result_items.append(segment_data)
+
+    return result_items
+
+async def get_activity_by_id(activity_id: int):
+    activity_data = await get_all_hash_fields(f"activity:{activity_id}")
+    return activity_data

@@ -2,7 +2,7 @@ from app.utils.auth import get_access_token
 from app.services import strava as strava_service
 from app.services import redis as redis_service
 
-async def fetch_starred_segments():
+async def fetch_starred_segments_from_strava():
     access_token = await get_access_token()
 
     if not access_token:
@@ -11,12 +11,25 @@ async def fetch_starred_segments():
     try:
         starred_segments = await strava_service.get_starred_segments(access_token=access_token)
         await save_starred_segments(starred_segments) # TODO: Implement this as a background task
-        return starred_segments
     except Exception as e:
-        raise Exception("Segment service :: Unable to fetch segments from Strava!")
+        raise Exception(f"Segment service :: Unable to fetch segments from Strava! {e}")
+
+async def fetch_starred_segments():
+    """Fetch starred segemnts data from redis, if not available fetch from strava
+    """
+    access_token = await get_access_token()
+
+    if not access_token:
+        raise Exception("No access token, please log in!")
+    
+    await fetch_starred_segments_from_strava()
+    segments_data = await redis_service.get_starred_segments("starredSegments")
+    return segments_data    
+
+async def fetch_segment_by_id(segment_id: int):
+    pass
 
 async def save_starred_segments(segments: list):
-    print(len(segments))
     for segment_item in segments:
         segment_hash_key = f"starredSegment:{segment_item.get('id')}"
         athlete_pr_effort = segment_item.get("athlete_pr_effort")
@@ -42,8 +55,8 @@ async def save_starred_segments(segments: list):
                 data=segment_data,
                 ttl=120) # TODO REMOVE AFTER TESTING
             
-            redis_service.add_to_list(
-                list_name="starredSegments",
+            redis_service.add_to_set(
+                set_name="starredSegments",
                 item=segment_item.get("id"),
                 ttl=120) # TODO REMOVE AFTER TESTING
         except Exception as e:
