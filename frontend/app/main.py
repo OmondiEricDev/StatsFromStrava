@@ -1,9 +1,6 @@
 import streamlit as st
 import requests
 import os
-from dotenv import load_dotenv
-
-loaded = load_dotenv()
 
 # Application's backend URL
 BACKEND_URL = st.secrets["BACKEND_URL"]
@@ -22,14 +19,6 @@ def main():
     st.markdown(
     "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Tracker! 👑</h1>",
     unsafe_allow_html=True)
-
-    main_page = st.Page("main.py", title="Home", icon="🏠", default=True)
-    profile_page = st.Page("profile.py", title="Profile", icon="👤")
-    segments_page = st.Page("segments.py", title="Segments", icon="🏁")
-    authcallback_page = st.Page("authcallback.py", title="Auth")
-
-    pg = st.navigation([main_page, profile_page, segments_page, authcallback_page])
-    pg.run()
     
     # Check if user is logged in
     if "access_token" not in st.session_state:
