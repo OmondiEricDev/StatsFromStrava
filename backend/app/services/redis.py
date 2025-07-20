@@ -75,3 +75,17 @@ async def get_starred_segments(list_name: str) -> list:
 async def get_activity_by_id(activity_id: int):
     activity_data = await get_all_hash_fields(f"activity:{activity_id}")
     return activity_data
+
+async def get_all_activities():
+    """Fetch all activities from redis"""
+    if redis_client.scard("activities") < 1:
+        return None
+
+    activities = redis_client.smembers("activities")
+    result_items = []
+
+    for activity_id in activities:
+        activity_data = await get_all_hash_fields(f"activity:{activity_id}")
+        result_items.append(activity_data)
+
+    return result_items
