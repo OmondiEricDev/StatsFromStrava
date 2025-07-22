@@ -2,7 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from app.services import redis as redis_service
+from app.services import redis_service as redis_service
 
 # Load environment variables
 loaded = load_dotenv()

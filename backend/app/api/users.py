@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.services import redis as redis_service
+from app.services import redis_service as redis_service
 from app.services import strava as strava_services
 from app.utils import auth as auth_utils
 
