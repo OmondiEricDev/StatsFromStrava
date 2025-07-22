@@ -2,7 +2,7 @@ import requests
 from typing import List
 from app.utils.auth import get_access_token
 from app.services import strava as strava_service
-from app.services import redis as redis_service
+from app.services import redis_service as redis_service
 from app.services import segment as segment_service
 from app.models.activitiy import Activity, Activities
 
@@ -98,12 +98,12 @@ async def save_activities(activities: List[dict]):
             redis_service.create_hash_set(
                 name_key=activity_hash_key,
                 data=activity_data,
-                ttl=420) # TODO REMOVE ADTER TESTING
+                ttl=21600)
             
             redis_service.add_to_set(
                 set_name="activities",
                 item=activity_item.get("id"),
-                ttl=420) # TODO RMEOVE ADTER TESTING
+                ttl=21600)
         except Exception as e:
             print(f"Unable to save activity data to redis -> {e}")
             raise Exception(e)

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 # from app.utils.auth import get_access_token
 from app.services import strava as strava_service
+from app.services import redis_service as redis_service
 
 loaded = load_dotenv()
 if not loaded:
@@ -74,7 +75,45 @@ async def get_starred_segments() -> str:
         return "\n---\n".join(formatted_segments)
     except Exception as e:
         return f"Error fetching starred segments: {e}"
-    
+
+@mcp.tool()
+async def get_activities() -> str:
+    """
+    Fetch activities cached in Redis.
+    """
+    try:
+        activities_data = await redis_service.get_all_activities()
+
+        if not activities_data:
+            return "No activities cached."
+
+        formatted_activities = []
+        for activity in activities_data:
+            distance_km = float(activity.get("distance", 0)) / 1000  # Convert meters to kilometers
+            formatted_activity = (
+                f"ID: {activity.get('id')}\n"
+                f"Type: {activity.get('type')}\n"
+                f"Name: {activity.get('name')}\n"
+                f"Distance: {distance_km} kilometers\n"
+                f"Moving Time: {activity.get('moving_time')} seconds\n"
+                f"Start Date: {activity.get('date')}\n"
+                f"Start Time: {activity.get('time')}\n"
+                f"Elevation Gain: {activity.get('elevation_gain', 'N/A')} meters\n"
+                f"Average Speed: {activity.get('avg_speed', 'N/A')} m/s\n"
+                f"Max Speed: {activity.get('max_speed', 'N/A')} m/s\n"
+                f"Average Power: {activity.get('avg_power', 'N/A')} W\n"
+                f"Max Power: {activity.get('max_power', 'N/A')} W\n"
+                f"Average Heart Rate: {activity.get('avg_heartrate', 'N/A')} bpm\n"
+                f"Max Heart Rate: {activity.get('max_heartrate', 'N/A')} bpm\n"
+                f"Kudos Count: {activity.get('kudos_count', 'N/A')}\n"
+                f"PR Count: {activity.get('pr_count', 'N/A')}\n"
+                f"Achievements Count: {activity.get('achievements_count', 'N/A')}"
+            )
+            formatted_activities.append(formatted_activity)
+        return "\n---\n".join(formatted_activities)
+    except Exception as e:
+        return f"Error fetching activities: {e}"  
+
 if __name__ == "__main__":
     # Run the FastMCP server
     print('...', file=sys.stderr)
