@@ -29,7 +29,6 @@ async def login():
     """ Redirect users to Strava's 3rd party app authorization page
     """
     auth_url = build_strava_auth_url()
-    print(auth_url)
     return RedirectResponse(url=auth_url)
 
 # Store auth data from streamlit
@@ -75,7 +74,6 @@ async def save_auth_data(auth_response_data: dict):
     reddis_client.hexpire(f"userAuth:{athlete_id}", ttl, "access_token")
     
     set_ttl = reddis_client.httl(f"userAuth:{athlete_id}", "access_token")
-    print(f"Access token TTL: {set_ttl}")
     
     reddis_client.hset(f"userProfile:{athlete_id}",
                        mapping=user_profile)

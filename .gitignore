@@ -1,4 +1,19 @@
 .env
+*.env
+.env.*
+config.py
+*.cfg
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.idea/
+.vscode/
+*.secret
+*.key
+*.pem
+credentials.json
+token.json
 
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100
