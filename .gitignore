@@ -8,7 +8,11 @@ config.py
 *.sqlite
 *.sqlite3
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+*/.vscode/*
+!*/.vscode/settings.json
+.venv/
 *.secret
 *.key
 *.pem
