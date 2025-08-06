@@ -2,32 +2,14 @@
 
 ## Project Overview
 
-**StatsFromStrava** is a full-stack analytics platform for cyclists, providing deep insights into Strava activities, with a focus on segment achievements. The project consists of a FastAPI-based backend and a Streamlit-based frontend(Working Progress), working together to deliver a seamless experience for tracking and analyzing data leveraging Strava's API and LLM integration (claude desktop) via an MCP server implementation.
-
-
-### Key Goals
-- **Strava Integration**: Secure OAuth2 authentication and data synchronization with Strava.
-- **Comprehensive Analytics**: Aggregation and analysis of activities, segments, and user performance.
-- **Performance Optimization**: Caching and efficient data management using Redis.
-- **User Experience**: Intuitive, interactive web interface for cyclists.
-- **Scalable Architecture**: Modular design for future enhancements and microservices.
+**StatsFromStrava** enables you to keep track of your performance across all of your starred Strava segments so that you can easily see and work towards achieving the coveted K/QOM status on your favorite routes. And that's not all,
+**StatsFromStrava** also provides a custom MCP server that leverages Claude to provide deeper analysis into your rides, that you can then use to create a customized training plan.
 
 ---
-
-## Project Structure
-
-- **Backend**: FastAPI REST API for authentication, data aggregation, caching, and business logic.
-- **Frontend**: Streamlit web app for user authentication, data visualization, and dashboard features.
-
----
-
-## More Information
+## Project Structure and Technical Information
 
 - [Backend README](backend/README.md) — FastAPI API, Redis caching, Strava integration, and more.
 - [Frontend README](frontend/README.md) — Streamlit UI, authentication flow, segment dashboards, and more.
-
----
-
 
 ---
 

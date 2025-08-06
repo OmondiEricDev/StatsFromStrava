@@ -1,4 +1,4 @@
-# StatsFromStrava - Frontend
+# StatsFromStrava - Frontend (Work In Progress)
 
 ## Overview
 
