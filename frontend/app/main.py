@@ -26,12 +26,17 @@ APPROVAL_PROMPT = "auto"
 AUTH_SCOPE = "read_all,profile:read_all,activity:read,activity:read_all"
 
 
-def format_time(time_seconds: int):
+def format_time(time_seconds: str):
+    if time_seconds == "NA":
+        return "NA"
+    time_seconds = int(time_seconds)
     minutes = int(time_seconds) // 60
     seconds = minutes % 60
     return f"{minutes:02}:{seconds:02}"
 
 def format_date(iso_date):
+    if iso_date is None or iso_date == "NA":
+        return "NA"
     formatted_date = datetime.strptime(iso_date, "%Y-%m-%dT%H:%M:%SZ")
     return formatted_date
 
@@ -47,9 +52,10 @@ def display_starred_segments(starred_segments):
                 st.metric("Climb Category",segment.get("climb_category"), border=True)
             with col2:
                 st.metric("KOM Status", "✅" if segment.get("kom_status") else "❌", border=True)
-                st.metric("PR Time", format_time(int(segment.get("pr_time"))), border=True)
+                st.metric("PR Time", format_time(segment.get("pr_time")), border=True)
             with col3:
-                st.metric("PR Date", f"{pr_date.year}/{pr_date.month}/{pr_date.day}", border=True)
+                date_display = "NA" if pr_date == "NA" else f"{pr_date.year}/{pr_date.month}/{pr_date.day}"
+                st.metric("PR Date", date_display, border=True)
                 st.metric("PR Activity", segment.get("pr_activity_id"), border=True)
 
 def main():

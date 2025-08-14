@@ -19,7 +19,6 @@ async def get_user_profile(user_id: int):
 @router.get("/athlete/{user_id}")
 async def get_athlete(user_id: int):
     access_token = await redis_service.get_access_token(user_id=user_id)
-    print(f"ACCESS TOKEN ----> {access_token}")
     if not access_token:
         raise Exception("No valid accesss token found")
     
