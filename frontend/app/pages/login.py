@@ -37,7 +37,7 @@ async def main():
         
     # Show login interface
     st.markdown(
-        "<h1 style='text-align: center; font-style: italic;'>🚴 Welcome to K/QOM Tracker! 👑</h1>",
+        "<h1 style='text-align: center; font-style: italic;'>🚴 K/QOM Hunter! 👑</h1>",
         unsafe_allow_html=True
     )
     

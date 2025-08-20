@@ -50,7 +50,7 @@ async def get_starred_segments() -> str:
         return "Unauthorized"
 
     try:
-        starred_segments = await strava_service.get_starred_segments(access_token)
+        starred_segments = await redis_service.get_starred_segments("starredSegments")
 
         if not starred_segments:
             return "No starred segments found."
