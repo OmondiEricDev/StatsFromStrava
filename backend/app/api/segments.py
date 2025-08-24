@@ -1,11 +1,18 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from app.services import segment as segments_service
+from app.services import activity as activity_service
 
 router = APIRouter()
 
+# Background task to populate user activity data
+async def populate_user_activity_data():
+    print("populating user activity data...")
+    _ = await activity_service.fetch_all_activities_strava()
+
 @router.get("/segments")
-async def get_starred_segments():
+async def get_starred_segments(background_tasks: BackgroundTasks):
     """Fetch all of the user's starred segments"""
+    background_tasks.add_task(populate_user_activity_data)
     try:
         starred_segements = await segments_service.fetch_starred_segments()
         return starred_segements
