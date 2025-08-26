@@ -14,6 +14,6 @@
 
 ---
 
-![Feature Screen Recording Placeholder](assets/demo.gif)
+![Feature Screen Recording Placeholder](assets/functionality-demo.gif)
 
 ---

@@ -6,7 +6,9 @@ from app.services import redis_service as redis_service
 
 # Load environment variables
 loaded = load_dotenv()
-print(loaded)
+if not loaded:
+    raise Exception("Failed to load environment variables from .env file")
+
 # Strava OAuth URLs and parameters
 STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize"
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
@@ -51,7 +53,7 @@ async def init_access_token(code: str):
 async def get_access_token():
     """ Returns access token if valid, otherwise returns a redreshed access token
     """
-    user_id = 13974060 # Find a way to dynamically access this
+    user_id = os.getenv("USER_ID")
     if await redis_service.access_token_exists(user_id):
         return await redis_service.get_access_token(user_id)
     
