@@ -44,9 +44,6 @@ backend/
 │   └── models/                # Data models and schemas
 │       ├── activitiy.py       # Activity data models (Pydantic)
 │       └── user.py            # User data models
-└── tests/                     # Test suite
-    ├── test_api.py
-    └── test_services.py
 ```
 
 ### Architectural Patterns

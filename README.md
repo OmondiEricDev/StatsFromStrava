@@ -2,8 +2,7 @@
 
 ## Project Overview
 
-**K/QOM Hunter** enables you to keep track of your performance across all of your starred Strava segments so that you can easily see and work towards achieving the coveted K/QOM status on your favorite routes. And that's not all,
-**K/QOM Hunter** also integrates with Claude desktop via a custom MCP server, leveraging AI for deeper analysis into your performance, generating insights that can be used to create a customized training plan.
+**K/QOM Hunter** is a full-stack web application that tracks performance across starred Strava segments, enabling cyclists to monitor progress toward achieving King/Queen of the Mountain (K/QOM) status on their favorite routes. The application features an integrated AI analysis system powered by Claude AI through a custom Model Context Protocol (MCP) server, providing personalized performance insights and data-driven training recommendations.
 
 ---
 
