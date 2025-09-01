@@ -7,7 +7,9 @@ The frontend of StatsFromStrava is a **Streamlit-based web application** that pr
 ## Architecture & Design
 
 ### Framework Choice
+
 The frontend is built using **Streamlit**, a Python-based framework that enables rapid development of data-driven web applications. This choice provides several advantages:
+
 - **Rapid prototyping** and development
 - **Built-in state management** through `st.session_state`
 - **Native support for data visualization** components
@@ -42,6 +44,7 @@ The application implements a **complete OAuth2 flow** with Strava:
 - **Backend Integration**: Securely passes authentication data to the backend API
 
 **Key Features:**
+
 - Scope-based permissions: `read_all,profile:read_all,activity:read,activity:read_all`
 - Secure token handling with session state management
 - Automatic redirection after successful authentication
@@ -51,22 +54,26 @@ The application implements a **complete OAuth2 flow** with Strava:
 The application uses Streamlit's native multi-page functionality:
 
 #### **Main Page (`main.py`)**
+
 - Application entry point with centralized authentication logic
 - Conditional rendering based on authentication status
 - Integration with backend API for data fetching
 
 #### **Profile Page (`profile.py`)**
+
 - Displays comprehensive user profile information
 - **Two-column layout** with profile image and user details
 - Shows: Name, username, location, gender, membership date, and bio
 
 #### **Segments Dashboard (`segments.py`)**
+
 - **Primary feature** displaying starred Strava segments
 - **Metric cards** showing segment statistics in a grid layout
 - **Real-time KOM/QOM status** with visual indicators (✅/❌)
 - **Time formatting** utilities for readable performance data
 
 #### **Authentication Callback (`authcallback.py`)**
+
 - Dedicated page for handling OAuth redirects
 - **Asynchronous token exchange** using `httpx` for better performance
 - Error handling and user feedback
@@ -88,29 +95,33 @@ The frontend communicates with the backend through **RESTful API calls**:
 ### 4. State Management
 
 **Streamlit session state** is used for:
+
 - `access_token`: User's Strava access token
 - `user_id`: Authenticated user's ID
 - `profile`: Cached user profile data
 - `starred_segments`: Cached segment data
 
-
-
 ## Technical Implementation
 
 ### Dependencies
+
 - **Streamlit**: Web framework and UI components
 - **Requests/HTTPX**: HTTP client libraries for API communication
 - **Python-dotenv**: Environment configuration management
 
 ### Configuration Management
+
 The application uses **Streamlit secrets** for secure configuration:
+
 - `BACKEND_URL`: Backend API endpoint
 - `STRAVA_CLIENT_ID`: Strava application ID
 - `STRAVA_CLIENT_SECRET`: Strava application secret
 - `STRAVA_REDIRECT_URI`: OAuth callback URL
 
 ### Error Handling
+
 Comprehensive error handling throughout:
+
 - **HTTP exception handling** with user-friendly error messages
 - **Authentication failure recovery** with retry mechanisms
 - **Graceful degradation** when backend services are unavailable
@@ -126,6 +137,7 @@ Comprehensive error handling throughout:
 ## Future Enhancements
 
 The architecture supports planned expansions:
+
 - **Chart Components**: Plotly-based visualizations for performance trends
 - **Authentication Components**: Modular auth UI components
 - **API Utilities**: Enhanced API client with retry logic and caching
@@ -134,6 +146,7 @@ The architecture supports planned expansions:
 ## Development Approach
 
 The frontend demonstrates several software engineering best practices:
+
 - **Separation of Concerns**: Clear division between authentication, data, and presentation logic
 - **Modular Architecture**: Page-based organization for maintainability
 - **Configuration Externalization**: Environment-based configuration management
